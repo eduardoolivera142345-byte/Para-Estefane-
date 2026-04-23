@@ -1,118 +1,90 @@
 import streamlit as st
-import time
+import urllib.parse
 
-# Configuração da página (Título que aparece na aba do navegador)
-st.set_page_config(page_title="Dindin da Cristina - Delivery", page_icon="🍦", layout="centered")
+# Configuração da página
+st.set_page_config(page_title="Dindin da Cristina", page_icon="🍦", layout="centered")
 
-# Estilo para deixar o site bonito e profissional
+# --- ESTILO PROFISSIONAL (CSS) ---
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    .header-box {
-        background-color: #ff4b4b;
-        padding: 20px;
-        border-radius: 0px 0px 20px 20px;
-        color: white;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .category-title {
-        background-color: #eee;
+    [data-testid="stAppViewContainer"] { background-color: #ffffff; }
+    .product-box {
+        display: flex;
+        align-items: center;
+        background-color: #f9f9f9;
         padding: 10px;
-        border-radius: 10px;
-        font-weight: bold;
-        color: #333;
-        margin: 20px 0px 10px 0px;
-    }
-    .product-card {
-        background-color: white;
-        padding: 15px;
         border-radius: 15px;
-        border-left: 5px solid #ff4b4b;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #eee;
     }
-    .price-tag { color: #28a745; font-weight: bold; font-size: 18px; }
+    .product-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+    .product-info { flex-grow: 1; }
+    .product-name { font-weight: bold; font-size: 16px; margin: 0; }
+    .product-price { color: #28a745; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
-# Cabeçalho do Site
-st.markdown("""
-    <div class="header-box">
-        <h1>🍦 Dindin da Cristina</h1>
-        <p>📍 Travessa Nossa Senhora da Conceição</p>
-        <p>🕒 Aberto agora • Pedido mínimo: R$ 10,00</p>
-    </div>
-    """, unsafe_allow_html=True)
+# Cabeçalho
+st.image("https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80", use_container_width=True) # Foto de capa
+st.title("🍦 Dindin da Cristina")
+st.caption("📍 Travessa Nossa Senhora da Conceição | 🛵 Entrega Rápida")
 
-st.write("### 📜 Nosso Cardápio")
-st.info("Faça sua seleção abaixo e finalize o pedido no final da página.")
+if 'carrinho' not in st.session_state:
+    st.session_state.carrinho = []
 
-# --- CATEGORIA GOURMET ---
-st.markdown('<div class="category-title">✨ DINDIN GOURMET - R$ 2,50</div>', unsafe_allow_html=True)
+def add(n, p):
+    st.session_state.carrinho.append({"n": n, "p": p})
+    st.toast(f"Adicionado: {n}")
 
-col1, col2 = st.columns(2)
+# --- FUNÇÃO PARA CRIAR ITEM COM FOTO ---
+def criar_item(nome, preco, img_url):
+    col_foto, col_info, col_btn = st.columns([1, 2, 1])
+    with col_foto:
+        st.image(img_url, width=80)
+    with col_info:
+        st.markdown(f"**{nome}**")
+        st.markdown(f"<span style='color:green'>R$ {preco:.2f}</span>", unsafe_allow_html=True)
+    with col_btn:
+        if st.button("Add", key=nome):
+            add(nome, preco)
+    st.divider()
 
-with col1:
-    st.markdown('<div class="product-card"><b>🍫 Ninho com Nutella</b><br><span class="price-tag">R$ 2,50</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Ninho + Nutella"):
-        st.toast("Ninho com Nutella adicionado!")
+# --- SEÇÃO GOURMET ---
+st.subheader("✨ Linha Gourmet - R$ 2,50")
+criar_item("Ninho com Nutella", 2.50, "https://cdn.pixabay.com/photo/2017/04/19/20/03/ice-cream-2243402_1280.jpg")
+criar_item("Oreo Especial", 2.50, "https://cdn.pixabay.com/photo/2016/03/31/21/53/ice-cream-1296707_1280.png")
 
-    st.markdown('<div class="product-card"><b>🍪 Oreo Especial</b><br><span class="price-tag">R$ 2,50</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Oreo"):
-        st.toast("Oreo adicionado!")
+# --- SEÇÃO TRADICIONAL ---
+st.subheader("🍦 Linha Tradicional - R$ 2,00")
+criar_item("Manga Natural", 2.00, "https://cdn.pixabay.com/photo/2016/03/31/18/07/fruit-1294125_1280.png")
+criar_item("Coco Cremoso", 2.00, "https://cdn.pixabay.com/photo/2014/12/21/23/34/coconut-575510_1280.png")
 
-with col2:
-    st.markdown('<div class="product-card"><b>🍓 Morango Gourmet</b><br><span class="price-tag">R$ 2,50</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Morango"):
-        st.toast("Morango Gourmet adicionado!")
-
-    st.markdown('<div class="product-card"><b>🥥 Prestígio Cremoso</b><br><span class="price-tag">R$ 2,50</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Prestígio"):
-        st.toast("Prestígio adicionado!")
-
-# --- CATEGORIA TRADICIONAL ---
-st.markdown('<div class="category-title">🍦 DINDIN TRADICIONAL - R$ 2,00</div>', unsafe_allow_html=True)
-
-col3, col4 = st.columns(2)
-
-with col3:
-    st.markdown('<div class="product-card"><b>🥭 Manga</b><br><span class="price-tag">R$ 2,00</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Manga"):
-        st.toast("Manga adicionada!")
-
-    st.markdown('<div class="product-card"><b>🥥 Coco</b><br><span class="price-tag">R$ 2,00</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Coco"):
-        st.toast("Coco adicionado!")
-
-with col4:
-    st.markdown('<div class="product-card"><b>🍇 Uva</b><br><span class="price-tag">R$ 2,00</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Uva"):
-        st.toast("Uva adicionada!")
-
-    st.markdown('<div class="product-card"><b>🍍 Abacaxi</b><br><span class="price-tag">R$ 2,00</span></div>', unsafe_allow_html=True)
-    if st.button("Adicionar Abacaxi"):
-        st.toast("Abacaxi adicionado!")
-
-# --- CARRINHO E FINALIZAÇÃO ---
-st.markdown("---")
-st.write("### 🛍️ Finalizar Pedido")
-
-nome_cliente = st.text_input("Seu Nome:")
-forma_pagamento = st.selectbox("Como deseja pagar?", ["Pix", "Dinheiro (Levar troco)", "Cartão na Entrega"])
-
-if st.button("🚀 ENVIAR PEDIDO AGORA"):
-    if nome_cliente:
-        with st.status("Enviando pedido para a Cristina...", expanded=True) as status:
-            time.sleep(1)
-            st.write("Organizando sacola...")
-            time.sleep(1)
-            st.write("Calculando rota de entrega...")
-            time.sleep(1)
-            status.update(label="Pedido Confirmado!", state="complete", expanded=False)
+# --- FINALIZAÇÃO ---
+if st.session_state.carrinho:
+    st.sidebar.header("🛒 Seu Carrinho")
+    total = 0
+    resumo = ""
+    for i in st.session_state.carrinho:
+        st.sidebar.write(f"{i['n']} - R$ {i['p']:.2f}")
+        total += i['p']
+        resumo += f"- {i['n']} (R$ {i['p']:.2f})\n"
+    
+    st.sidebar.write(f"### Total: R$ {total:.2f}")
+    
+    with st.expander("Finalizar Pedido"):
+        nome = st.text_input("Seu Nome")
+        cpf = st.text_input("CPF")
+        endereco = st.text_input("Endereço completo")
+        cel = st.text_input("Celular")
         
-        st.balloons()
-        st.success(f"Parabéns **{nome_cliente}**! Seu pedido foi enviado para a **Travessa Nossa Senhora da Conceição**.")
-        st.warning("Aguarde o contato da Cristina para confirmar a entrega!")
-    else:
-        st.error("Por favor, digite seu nome para que possamos te identificar!")
+        if st.button("Enviar para o WhatsApp"):
+            msg = f"Dindin da Cristina!\n\nPedido:\n{resumo}\nTotal: R$ {total:.2f}\n\nCliente: {nome}\nCPF: {cpf}\nEnd: {endereco}\nCel: {cel}"
+            link = f"https://wa.me/5583993856238?text={urllib.parse.quote(msg)}"
+            st.link_button("📲 Confirmar no WhatsApp", link)
+            
