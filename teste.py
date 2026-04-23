@@ -18,6 +18,6 @@ if st.button("Verificar"):
         st.write("### Eu te amo muito!")
         
         # Opcional: Você pode colocar um link para uma foto de vocês aqui
-        st.image("lv_7283941053110045957_20260217044534.mp4") 
+        st.image("https://photos.app.goo.gl/MAEW4drtNq5qCRN88") 
     else:
         st.error("Ops! O nome ou a data estão incorretos. Tente de novo.")
